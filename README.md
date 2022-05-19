@@ -7,6 +7,7 @@
 
 
 Feature Extraction
+
 -- Use Python 2.7
 
 class FeatureType(enum.Enum):
@@ -22,7 +23,12 @@ class FeatureType(enum.Enum):
 
 
 
+
+
 CrossValidation
+
 -- Use Python 3.6
+
 -- change "feature_type" variable               # feature_type = 'customsmali_perm_lib'
+
 -- python accuracy_results.py
