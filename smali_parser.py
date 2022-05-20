@@ -305,7 +305,7 @@ class SmaliFile(object):
         for usedPer in root.iter("uses-permission"):
             perName = (usedPer.attrib[ns + 'name']).lower()
             if perName in permission_feature:
-                permission_feature[perName] = 1  #####################permission_feature.keys() icinde var mi yok mu kontrol etmek lazim olabilir
+                permission_feature[perName] = 1 
                 i += 1
 
         return permission_feature
