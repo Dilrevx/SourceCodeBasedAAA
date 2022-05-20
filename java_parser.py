@@ -64,7 +64,7 @@ class JavaFile(object):
                         aaaa = 5
                     if root.split('sources/')[-1].__eq__(lib):
                         isLib = True
-                        library_feature[lib] = 1  ########################################### +1 de yapilabilir kac kere libraryi kullanmis
+                        library_feature[lib] = 1  
                         break
                 if isLib == False:
                     for filename in files:
