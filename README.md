@@ -5,7 +5,7 @@
 
 2. Create "feature", "result" and "smali" folder in the working directory.
 
-3. The applications must be inside "apk" folder. The structure of the folders must be like below:
+3. The applications must be inside "apk" folder. feature_extraction.py automatically reads all applications inside "apk" folder. The structure of the folders must be like below:
 
     /apk
     
@@ -21,7 +21,7 @@ Feature Extraction
 -- Use Python 2.7
 
 class FeatureType(enum.Enum):
-    Apktool = 0
+    Apktool = 0 \\
     CustomSmali = 1
     AllSmali = 2
     Permission = 3
