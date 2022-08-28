@@ -7,8 +7,11 @@
 
 3. The applications must be inside "apk" folder. The structure of the folders must be like below:
     /apk
+    
     -/market
+    
     --/developer
+    
     ---/apk
 
 
