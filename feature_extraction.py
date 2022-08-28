@@ -133,7 +133,7 @@ def creator_feature_extract(creator, csv_path, featureTypes, feature_folder, aut
 
 
 def main():
-    MARKET_NAME = 'malware'
+    MARKET_NAME = sys.argv[1] #'malware'
     APK_FOLDER = os.getcwd() + '/apk'
     DEC_PATH = os.getcwd() + '/smali'
     FEATURE_FOLDER_NAME = os.getcwd() + '/feature'
@@ -143,8 +143,8 @@ def main():
     NUMBER_OF_NGRAM = 10000
     pool_size = 8
 
-    featureTypes = sys.argv[1:]
-    featureTypes = [1, 3, 4]
+    featureTypes = sys.argv[2:]
+    #featureTypes = [1, 3, 4]
     feature_folder = ""
     for featureType in featureTypes:
         ft = int(featureType)
