@@ -9,11 +9,11 @@
 
     /apk
     
-    -/market
+    -/$market_name
     
-    --/developer
+    --/$developer_name
     
-    ---/apk
+    ---/$*.apk
 
 
 Feature Extraction
