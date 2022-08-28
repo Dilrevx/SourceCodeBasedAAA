@@ -6,6 +6,7 @@
 2. Create "feature", "result" and "smali" folder in the working directory.
 
 3. The applications must be inside "apk" folder. The structure of the folders must be like below:
+
     /apk
     
     -/market
