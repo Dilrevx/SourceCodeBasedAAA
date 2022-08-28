@@ -13,7 +13,7 @@
     
     --/$developer_name
     
-    ---/$*.apk
+    ---/*.apk
 
 
 Feature Extraction
