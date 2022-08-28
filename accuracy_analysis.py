@@ -169,13 +169,13 @@ def crossval(dataset, cv, epoch):
 
 if __name__ == '__main__':
 
-    db_name = 'malware'
-    rq = 'accuracy_analysis'
+    db_name = sys.argv[1] #'malware'
+    rq = db_name + '.csv'
     epoch = 5
     cv = 10
     apk_number_per_author = 10
     percentiles = [100]
-    feature_type = 'customsmali_perm_lib'
+    feature_type = sys.argv[2] #'customsmali_perm_lib'
     number_of_ngram = 10000
     ngram_type = 'all'
 
