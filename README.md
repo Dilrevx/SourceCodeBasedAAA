@@ -74,7 +74,7 @@ python3 accuracy_results.py $database_name allsmali_perm
 3- To add AppAuth features, download source code of AppAuth from "https://github.com/buptkick/AppAuth". The output of feature csv files for AppAuth and our tool are same. You can combine two csv files side by side.</br>
 
 <h2>N-Gram Results</h2>
-1- Change the "number_of_ngram" variable in accuracy_analysis.py to number you want. Default number is 10000. Run above command
+1- Change the "number_of_ngram" variable in accuracy_analysis.py to number you want. Default number is 10000. Run below command
 
 ```
 python accuracy_results.py $database_name ngram
