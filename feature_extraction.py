@@ -107,7 +107,7 @@ def creator_feature_extract(creator, csv_path, featureTypes, feature_folder, aut
         return
     csvname = csv_path + '/' + feature_folder + "/" + creator.split('/')[-1] + '.csv'
     # csvname = csv_path + '/' + feature_folder + "/" + feature_folder + '.csv'
-    with open(csvname, 'wb') as wf:
+    with open(csvname, 'w') as wf:
         writer = csv.writer(wf)
         acnt = 0
         for apk in os.listdir(creator):
@@ -122,10 +122,10 @@ def creator_feature_extract(creator, csv_path, featureTypes, feature_folder, aut
                         writer.writerow(l)
 
                 except:
-                    err = str(sys.exc_info()[0]) + str(sys.exc_info()[1])
+                    import traceback
                     print("-------------------------------------")
                     print("PARSE APK ERROR!: " + str(auth), str(acnt), apkpath)
-                    print(err)
+                    traceback.print_exc()
                     print("-------------------------------------")
                     f = open("errors.txt", "w+")
                     sys.stdout.flush()

@@ -25,6 +25,12 @@ class FeatureType(enum.Enum): </br>
 ```
 python feature_extraction.py $database_name 1 3 4
 ```
+
+> Notice: For reproductions, `miniconda` is strongly recomended. `mkvirtualenv` has stopped supporting python 2 environments. And ubuntu's default python2.7 do not have pip2, pip is pip3.
+>
+> Edit: `feature_extraction.py` has been updated to support python3.6. You can use python3.6 to run the script. However this upgrade is somehow incomplete. You need to run the above test cli command, and debug untill it produce ascii-csv files.
+
+> Notice: The defalt ./apk dataset cannot be runned. Set ` apk_number_per_author = 3` to test it.
  
 
 <h1>CrossValidation</h1>

@@ -172,7 +172,7 @@ class LibRadarLite(object):
             logger.critical("file path %s is not a file" % self.apk_path)
             raise AssertionError
         file_sha256 = hashlib.sha256()
-        f = file(self.apk_path, 'rb')
+        f = open(self.apk_path, 'rb')
         while True:
             block = f.read(4096)
             if not block:
