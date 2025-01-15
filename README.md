@@ -24,6 +24,7 @@ class FeatureType(enum.Enum): </br>
 3- e.g. use below command to extract customsmali_perm_lib features. This command creates customsmali_perm_lib.csv inside the "feature/$database_name/customsmali_perm_lib/" folder.</br>
 ```
 python feature_extraction.py $database_name 1 3 4
+python feature_extraction.py sdkid-creator-path 1 3 4
 ```
 
 > Notice: For reproductions, `miniconda` is strongly recomended. `mkvirtualenv` has stopped supporting python 2 environments. And ubuntu's default python2.7 do not have pip2, pip is pip3.
