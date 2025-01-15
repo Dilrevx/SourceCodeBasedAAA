@@ -27,6 +27,7 @@ import hashlib
 import zipfile
 import json
 import shutil
+import subprocess
 
 
 class LibRadarLite(object):
@@ -126,11 +127,10 @@ class LibRadarLite(object):
         self.dec_path = DEC_PATH + "/%s/%s/%s" % (market_name, writer_name, self.hex_sha256)
 
         if not os.path.exists(self.dec_path):
-            ret = 0
             command = 'java -jar -Xmx4096m ' + os.getcwd() +'/apktool_2.3.4.jar d \"' + self.apk_path + '\" -o \"' + self.dec_path + '\" -f -s > /dev/null 2>&1'
-            ret += os.system(command)
+            subprocess.check_call(command, shell=True)
             command = 'baksmali disassemble \"' + self.dec_path + '/classes.dex\" -o \"' + self.dec_path + '/smali\" > /dev/null 2>&1'
-            ret += os.system(command)
+            subprocess.check_call(command, shell=True)
 
         for file_name in os.listdir(self.dec_path):
             if file_name.endswith('.dex'):
