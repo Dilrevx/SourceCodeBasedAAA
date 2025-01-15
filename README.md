@@ -31,6 +31,8 @@ python feature_extraction.py $database_name 1 3 4
 > Edit: `feature_extraction.py` has been updated to support python3.6. You can use python3.6 to run the script. However this upgrade is somehow incomplete. You need to run the above test cli command, and debug untill it produce ascii-csv files.
 
 > Notice: The defalt ./apk dataset cannot be runned. Set ` apk_number_per_author = 3` to test it.
+
+> Notice: liteRadar in literadar.py uses an unpresented cli tool `baksmali`. This is a google R8 repository now and you need to build a fat jar to enable cli functionalities under jdk11. I am using a old version by JesusFreke, `baksmali-2.5.2.jar`, where cli interface is included in release versions. jdk17 works fine with this jar.
  
 
 <h1>CrossValidation</h1>

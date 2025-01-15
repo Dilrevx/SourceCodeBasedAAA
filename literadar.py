@@ -129,7 +129,8 @@ class LibRadarLite(object):
         if not os.path.exists(self.dec_path):
             command = 'java -jar -Xmx4096m ' + os.getcwd() +'/apktool_2.3.4.jar d \"' + self.apk_path + '\" -o \"' + self.dec_path + '\" -f -s > /dev/null 2>&1'
             subprocess.check_call(command, shell=True)
-            command = 'baksmali disassemble \"' + self.dec_path + '/classes.dex\" -o \"' + self.dec_path + '/smali\" > /dev/null 2>&1'
+            
+            command = 'java -jar -Xmx4096m ' + os.getcwd() +'/baksmali-2.5.2.jar disassemble \"' + self.dec_path + '/classes.dex\" -o \"' + self.dec_path + '/smali\" > /dev/null 2>&1'
             subprocess.check_call(command, shell=True)
 
         for file_name in os.listdir(self.dec_path):
