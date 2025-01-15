@@ -24,7 +24,7 @@ class FeatureType(enum.Enum): </br>
 3- e.g. use below command to extract customsmali_perm_lib features. This command creates customsmali_perm_lib.csv inside the "feature/$database_name/customsmali_perm_lib/" folder.</br>
 ```
 python feature_extraction.py $database_name 1 3 4
-python feature_extraction.py sdkid-creator-path 1 3 4
+python feature_extraction.py sdkid-creator-path 1 2 3 4 5 6
 ```
 
 > Notice: For reproductions, `miniconda` is strongly recomended. `mkvirtualenv` has stopped supporting python 2 environments. And ubuntu's default python2.7 do not have pip2, pip is pip3.
@@ -35,6 +35,7 @@ python feature_extraction.py sdkid-creator-path 1 3 4
 
 > Notice: liteRadar in literadar.py uses an unpresented cli tool `baksmali`. This is a google R8 repository now and you need to build a fat jar to enable cli functionalities under jdk11. I am using a old version by JesusFreke, `baksmali-2.5.2.jar`, where cli interface is included in release versions. jdk17 works fine with this jar.
  
+> Notice: Some feature sets are conflicting with each other. For example, `xxxsmali` and `java` cannot be extracted at the same time.
 
 <h1>CrossValidation</h1>
 1- Use Python 3.6</br>

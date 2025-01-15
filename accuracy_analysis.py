@@ -1,4 +1,5 @@
 import os
+from typing import List
 import pandas as pd
 import numpy as np
 from sklearn.impute import SimpleImputer
@@ -9,8 +10,18 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.feature_selection import SelectPercentile, f_classif, VarianceThreshold
 
 
-def create_dataset_object(feature_type, number_of_ngram):
-    column_names = []
+def create_dataset_object(feature_type: str, number_of_ngram: int):
+    '''
+    Example: feature_type = 'customsmali_perm_lib', number_of_ngram = 10000
+
+    This function creates a pandas DataFrame object.
+    
+    The csv files in `./feature/` do not have column names. Each apk's feature is stored in a row of hundreds of columns.
+     
+    /Data/feature_list is used to get the column names.
+    Pandas allows the specified names(feature_list content) to be more than the actual number of columns in the DataFrame.
+    '''
+    column_names: List[str] = []  # ["apkName", "smali", "java", "conf", "res", "dex", "perm", "lib", "metadata", "ngram", "label"]
     with open(os.getcwd() + "/Data/feature_list", "r") as f:
         lines = f.readlines()
         column_names.append('apkName')
@@ -54,14 +65,17 @@ def create_dataset_object(feature_type, number_of_ngram):
     return pd.DataFrame(columns=column_names)
 
 
-def read_all_csv_from_db_folder(feature_folder, type, number_of_ngram):
+def read_all_csv_from_db_folder(feature_folder: str, type: str, number_of_ngram: int):
+    '''
+    Example: feature_folder = 'feature/malware/customsmali_perm_lib', type = 'customsmali_perm_lib', number_of_ngram = 10000
+    '''
     dataset = create_dataset_object(type, number_of_ngram)
     i = 0
     file_name = "{}/{}.csv".format(feature_folder, type)
 
     with open(file_name, 'r') as f:
         data = pd.read_csv(f, header=None, names=dataset.columns)
-        dataset = dataset.append(data, ignore_index=True)
+        dataset = pd.concat([dataset, data], ignore_index=True)
         i += 1
     return dataset
 
@@ -72,7 +86,7 @@ def combine_dataset(X, y, apkName, column_list):
     return pd.DataFrame(data=temp, index=range(0, len(temp)), columns=column_list)
 
 
-def clean_dataset(dataset):
+def clean_dataset(dataset: pd.DataFrame):
     if not dataset.empty:
         impute = SimpleImputer(missing_values=np.nan, strategy='mean')
         temp = impute.fit_transform(dataset.iloc[:, 1:-1])
