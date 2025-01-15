@@ -92,3 +92,10 @@ python accuracy_results.py $database_name ngram
 
 ## References
 
+# Reproduction Settings
+
+## Feature Extraction
+
+```python
+apk_number_per_author = 2
+```

@@ -168,6 +168,7 @@ def crossval(dataset, cv, epoch):
 
 
 if __name__ == '__main__':
+    import sys
 
     db_name = sys.argv[1] #'malware'
     rq = db_name + '.csv'

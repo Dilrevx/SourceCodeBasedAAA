@@ -49,8 +49,10 @@ class FeatureType(enum.Enum):
 
 
 def parseApk(iron_apk_path, featureTypes, csvname, auth=0, acnt=0):
+    print(iron_apk_path, featureTypes, csvname, auth, acnt)
     lrd = literadar.LibRadarLite(iron_apk_path)
     res = lrd.compare()
+    print("Dec:", lrd.dec_path)
     apkFeature = []
     vectorIndex = 0
 
@@ -139,7 +141,7 @@ def main():
     FEATURE_FOLDER_NAME = os.getcwd() + '/feature'
     creator_path = APK_FOLDER + '/' + MARKET_NAME
     csv_path = FEATURE_FOLDER_NAME + "/" + MARKET_NAME
-    apk_number_per_author = 10
+    apk_number_per_author = 2
     NUMBER_OF_NGRAM = 10000
     pool_size = 8
 
