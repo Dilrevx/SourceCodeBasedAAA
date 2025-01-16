@@ -6,3 +6,4 @@ log_libradar.txt
 feature
 result
 **/**.pyc
+Data/feature_list.meta
