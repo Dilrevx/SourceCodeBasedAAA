@@ -52,7 +52,7 @@ RF acc : 0.9756463453
 RF f1 : 0.968457474
 ```
 
-
+> Notice: the demo market dataset is too small to run the cross validation. Its feature contains a lot of zeros which breaks the code. You need a bigger dataset
 
 
 

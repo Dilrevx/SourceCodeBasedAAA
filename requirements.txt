@@ -3,3 +3,5 @@ six
 numpy
 pandas
 scikit-learn
+lightgbm
+# Note: for python 2.7, remember to install enum34 rather than enum

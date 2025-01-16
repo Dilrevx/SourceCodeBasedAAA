@@ -4,10 +4,14 @@ import pandas as pd
 import numpy as np
 from sklearn.impute import SimpleImputer
 from sklearn.model_selection import cross_validate
+from sklearn.naive_bayes import GaussianNB
+from sklearn.neighbors import KNeighborsClassifier
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import StratifiedKFold
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.feature_selection import SelectPercentile, f_classif, VarianceThreshold
+from sklearn.svm import SVC
+import lightgbm as lgb
 
 
 def create_dataset_object(feature_type: str, number_of_ngram: int):
