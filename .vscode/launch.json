@@ -23,6 +23,17 @@
                 "3",
                 "4"
             ]
+        },
+        {
+            "name": "Debug acc",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/accuracy_analysis.py",
+            "console": "integratedTerminal",
+            "args": [
+                "sdkid-creator-path",
+                "customsmali_perm_lib"
+            ]
         }
     ]
 }

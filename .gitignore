@@ -5,3 +5,4 @@ errors.txt
 log_libradar.txt
 feature
 result
+**/**.pyc

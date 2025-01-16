@@ -26,11 +26,13 @@
 
 
 import os
+from pathlib import Path
 import sys
 import csv
 import enum
 import shutil
 import multiprocessing
+from typing import List
 
 import literadar
 import smali_parser
@@ -47,6 +49,16 @@ class FeatureType(enum.Enum):
     Metadata = 5
     Java = 6
 
+NEW_FEATURE_LIST = False
+def write_feature_list(colnames: List[str], file=Path("./Data/feature_list.meta")):
+    '''
+    Pass in list of column names to write to a file
+    '''
+    global NEW_FEATURE_LIST
+    f = open(file, "w" if not NEW_FEATURE_LIST else "a")
+    f.write(",".join(colnames) + "\n")
+    f.close()
+    NEW_FEATURE_LIST = True
 
 def parseApk(iron_apk_path, featureTypes, csvname, auth=0, acnt=0):
     print(iron_apk_path, featureTypes, csvname, auth, acnt)
@@ -55,6 +67,7 @@ def parseApk(iron_apk_path, featureTypes, csvname, auth=0, acnt=0):
     print("Dec:", lrd.dec_path)
     apkFeature = []
     vectorIndex = 0
+    write_feature_list(["apkname"])
 
     for featureType in featureTypes:
         ft = int(featureType)
@@ -66,6 +79,7 @@ def parseApk(iron_apk_path, featureTypes, csvname, auth=0, acnt=0):
                 # print(s[0])
                 vectorIndex += 1
                 apkFeature.append(float(s[1]))
+            write_feature_list(["customsmali_" + str(i) for i in range(len(sfs))])
         elif ft == FeatureType.Java.value:
             jp = java_parser.JavaFile(lrd.dec_path.replace('Smali', 'Java'), 1)
             jf = jp.parse
@@ -74,6 +88,7 @@ def parseApk(iron_apk_path, featureTypes, csvname, auth=0, acnt=0):
                 # print(j[0])
                 vectorIndex += 1
                 apkFeature.append(float(j[1]))
+            write_feature_list(["java_" + str(i) for i in range(len(jfs))])
         elif ft == FeatureType.AllSmali.value:
             sp = smali_parser.SmaliFile(lrd.dec_path, 1)
             sf = sp.parseSmali
@@ -82,6 +97,7 @@ def parseApk(iron_apk_path, featureTypes, csvname, auth=0, acnt=0):
                 # print(s[0])
                 vectorIndex += 1
                 apkFeature.append(float(s[1]))
+            write_feature_list(["allsmali_" + str(i) for i in range(len(sfs))])
         elif ft == FeatureType.Permission.value:
             sp = smali_parser.SmaliFile(lrd.dec_path, 0)
             pf = sp.parsePermission(lrd.dec_path)
@@ -90,6 +106,7 @@ def parseApk(iron_apk_path, featureTypes, csvname, auth=0, acnt=0):
                 # print(p[0])
                 vectorIndex += 1
                 apkFeature.append(float(p[1]))
+            write_feature_list(["perm_" + str(i) for i in range(len(pfs))])
         elif ft == FeatureType.Library.value:
             sp = smali_parser.SmaliFile(lrd.dec_path, 0)
             lf = sp.getLibrary()
@@ -99,6 +116,7 @@ def parseApk(iron_apk_path, featureTypes, csvname, auth=0, acnt=0):
                 # print(l[0])
                 vectorIndex += 1
                 apkFeature.append(float(l[1]))
+            write_feature_list(["lib_" + str(i) for i in range(len(lfs))])
     lrd.__close__()
     print(auth, acnt, iron_apk_path)
     return apkFeature
@@ -221,7 +239,7 @@ def main():
     lines = []
     try:
         path, dirs, files = next(os.walk(csv_folder))
-        with open('{}/{}.csv'.format(csv_folder, feature_folder), 'wb') as wf:
+        with open('{}/{}.csv'.format(csv_folder, feature_folder), 'w') as wf:
             writer = csv.writer(wf)
             for file in files:
                 with open('{}/{}'.format(csv_folder, file), 'r') as f:

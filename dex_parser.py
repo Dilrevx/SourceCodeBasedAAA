@@ -190,7 +190,7 @@ class DecodedInstruction(object):
 
 
 def dexDecodeInstruction(dexFile, dexCode, offset):
-    byteCounts = offset / 4
+    byteCounts = offset//4
     insns = dexCode.insns
 
     if insns == '':
@@ -350,7 +350,7 @@ def dexDecodeInstruction(dexFile, dexCode, offset):
 
         decodedInstruction.op = 'goto'
         decodedInstruction.vA = AA
-        decodedInstruction.smaliCode = 'goto %s //%s' % (hex(offset / 4 + buma), hex(buma))
+        decodedInstruction.smaliCode = 'goto %s //%s' % (hex(offset//4 + buma), hex(buma))
         decodedInstruction.offset = offset
         decodedInstruction.length = 4
 
@@ -363,7 +363,7 @@ def dexDecodeInstruction(dexFile, dexCode, offset):
 
             decodedInstruction.op = 'goto/16'
             decodedInstruction.vA = AAAA
-            decodedInstruction.smaliCode = 'goto/16 %s //%s' % (hex(offset / 4 + buma), hex(buma))
+            decodedInstruction.smaliCode = 'goto/16 %s //%s' % (hex(offset//4 + buma), hex(buma))
             decodedInstruction.offset = offset
             decodedInstruction.length = 8
 
@@ -408,7 +408,7 @@ def dexDecodeInstruction(dexFile, dexCode, offset):
         decodedInstruction.op = op
         decodedInstruction.vA = AA
         decodedInstruction.vB = BBBB
-        decodedInstruction.smaliCode = '%s v%d, %s //+%s' % (op, AA, hex(BBBB + offset / 4), hex(BBBB))
+        decodedInstruction.smaliCode = '%s v%d, %s //+%s' % (op, AA, hex(BBBB + offset//4), hex(BBBB))
         decodedInstruction.offset = offset
         decodedInstruction.length = 8
 
@@ -573,7 +573,7 @@ def dexDecodeInstruction(dexFile, dexCode, offset):
         decodedInstruction.vA = A
         decodedInstruction.vB = B
         decodedInstruction.vC = CCCC
-        decodedInstruction.smaliCode = '%s v%d, v%d, %s // +%s' % (op, A, B, hex(offset / 4 + int(CCCC, 16)), CCCC)
+        decodedInstruction.smaliCode = '%s v%d, v%d, %s // +%s' % (op, A, B, hex(offset//4 + int(CCCC, 16)), CCCC)
         decodedInstruction.offset = offset
         decodedInstruction.length = 8
 
@@ -648,7 +648,7 @@ def dexDecodeInstruction(dexFile, dexCode, offset):
 
             decodedInstruction.op = 'goto/32'
             decodedInstruction.vA = int(AAAAAAAA, 16)
-            decodedInstruction.smaliCode = 'goto/32 %s //%s' % (hex(offset / 4 + buma), hex(buma))
+            decodedInstruction.smaliCode = 'goto/32 %s //%s' % (hex(offset//4 + buma), hex(buma))
             decodedInstruction.offset = offset
             decodedInstruction.length = 12
 
@@ -1854,7 +1854,7 @@ class DexFile(object):
                 continue
 
             insns = dexMethod.dexCode.insns[decodedInstruction.offset:decodedInstruction.offset + decodedInstruction.length]
-            print('    \t%-16s|%04x: %s' % (insns, offset / 4, smaliCode))
+            print('    \t%-16s|%04x: %s' % (insns, offset//4, smaliCode))
             offset += len(insns)
 
             if smaliCode == 'nop':
@@ -1903,12 +1903,12 @@ class DexFile(object):
         dexCode.insns = insns
 
         dexCode.offset = codeOff
-        dexCode.length = 16 + len(insns) / 2
+        dexCode.length = 16 + len(insns)//2
 
         return dexCode
 
     def readUnsignedLeb128(self, hex_value):
-        byte_counts = len(hex_value) / 2
+        byte_counts = len(hex_value)//2
 
         # 找出第一个不是0的byte位置
         index = 0
@@ -1919,7 +1919,7 @@ class DexFile(object):
                 break
 
         hex_value = hex_value[index * 2:]
-        byte_counts = len(hex_value) / 2
+        byte_counts = len(hex_value)//2
 
         result = 0
         for i in range(byte_counts):
