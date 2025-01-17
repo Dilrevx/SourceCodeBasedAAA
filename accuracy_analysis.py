@@ -79,7 +79,6 @@ class TFPNCounter:
         """
         TP, FP, TN, FN = 0, 0, 0, 0
         for i in range(len(y_true)):
-            print(f"y_true: {y_true[i]}, y_pred: {y_pred[i]}")
             if y_true[i] == y_pred[i]:
                 if y_true[i] in self.negatives:
                     TN += 1
@@ -101,20 +100,24 @@ class AssociationOutputWriter:
     def __init__(self, output_file: Path):
         self.output_file = output_file
 
-    def dump(self, dataset: pd.DataFrame, y: NDArray, y_pred: NDArray):
+    def dump(self, dataset: pd.DataFrame, y_pred: NDArray, print=False):
         """
         X: apkName
         y: true label
         y_pred: predicted label
         """
-        ret = {"ground_truth": defaultdict(list), "predicted": defaultdict(list)}
+        ret = defaultdict(lambda: defaultdict(list))
 
-        for i in range(len(y)):
-            author = y[i]
+        for i in range(dataset.shape[0]):
+            author = dataset.iloc[i, -1]
             apkName = dataset.iloc[i, 0]
             pred_author = y_pred[i]
-            ret["ground_truth"][author].append(apkName)
-            ret["predicted"][pred_author].append(apkName)
+
+            ret[author]["ground_truth"].append(apkName)
+            ret[pred_author]["predicted"].append(apkName)
+
+            if print:
+                print(f"{apkName} - y-true: {author} -> y-pred {pred_author}")
 
         json.dump(ret, self.output_file.open("w"), indent=4)
 
@@ -288,57 +291,6 @@ def feature_selection(dataset, percentile):
     return combine_dataset(X_new, y, z, dataset.columns[idx])
 
 
-def log(fd, str, newline):
-    if newline:
-        fd.write(str + "\n")
-    else:
-        fd.write(str)
-
-
-def crossval(dataset: pd.DataFrame, cv: int, epoch: int):
-    # fmt: off
-    random_states = [12, 22, 32, 42, 52, 358, 52, 229, 879, 272, 330, 263, 530, 614, 456, 943, 224, 559, 349, 612, 407, 60, 639, 354, 662, 767, 246, 852, 816, 502, 896, 968, 829, 128, 168, 203, 740,643, 445, 326, 560, 154, 693, 500, 190, 949, 625, 239, 391, 693]
-    # fmt: on
-
-    X = dataset.values[:, 1:-1]
-    y = dataset.values[:, -1]
-    acc = []
-    f1 = []
-
-    names = ["GNB", "KNN", "SVC", "RF", "LGBM"]
-    # names = ['RF']
-
-    classifiers = [
-        GaussianNB(),
-        KNeighborsClassifier(n_jobs=40),
-        SVC(),
-        RandomForestClassifier(random_state=42, n_jobs=40),
-        lgb.LGBMClassifier(
-            random_state=42, boosting_type="gbdt", n_jobs=40, learning_rate=0.05
-        ),
-    ]
-    for name, model in zip(names, classifiers):
-        for e in range(epoch):
-            kfold = StratifiedKFold(
-                n_splits=cv, shuffle=True, random_state=random_states[e]
-            )
-            scores = cross_validate(
-                model,
-                X,
-                y,
-                cv=kfold,
-                n_jobs=40,
-                scoring=["accuracy", "f1_weighted"],
-                verbose=1,
-            )
-            acc.extend(scores["test_accuracy"].tolist())
-            f1.extend(scores["test_f1_weighted"].tolist())
-        # print(*acc, sep='\n')
-        print(name + " acc : " + str(np.average(acc)))
-        # print(*f1, sep='\n')
-        print(name + " f1 : " + str(np.average(f1)))
-
-
 def crossval_TFPN(
     dataset: pd.DataFrame,
     cv: int,
@@ -347,6 +299,11 @@ def crossval_TFPN(
     original_dataset: pd.DataFrame,
     owriter: AssociationOutputWriter,
 ):
+    """
+    Modified cross validation function to calculate TP, TN, FP, FN.
+
+    The original cross validation function is deleted, check the git history for the original code.
+    """
     # fmt: off
     random_states = [12, 22, 32, 42, 52, 358, 52, 229, 879, 272, 330, 263, 530, 614, 456, 943, 224, 559, 349, 612, 407, 60, 639, 354, 662, 767, 246, 852, 816, 502, 896, 968, 829, 128, 168, 203, 740,643, 445, 326, 560, 154, 693, 500, 190, 949, 625, 239, 391, 693]
     # fmt: on
@@ -354,61 +311,35 @@ def crossval_TFPN(
     X = dataset.values[:, 1:-1]
     y = dataset.values[:, -1]
 
-    acc = []
-    f1 = []
-    tp = []
-    tn = []
-    fp = []
-    fn = []
-
-    # names = ['GNB', 'KNN', 'SVC', 'RF', 'LGBM']
-    names = ["RF"]
-
-    classifiers = [
-        # GaussianNB(),
-        # KNeighborsClassifier(n_jobs=40),
-        # SVC(),
-        RandomForestClassifier(random_state=42, n_jobs=40),
-        # lgb.LGBMClassifier(random_state=42, boosting_type='gbdt', n_jobs=40, learning_rate=0.05)
+    classifiers: List[Tuple[str, GaussianNB]] = [
+        # ("GNB", GaussianNB()),
+        # ("KNN", KNeighborsClassifier(n_jobs=40)),
+        # ("SVC", SVC()),
+        ("RF", RandomForestClassifier(random_state=42, n_jobs=40)),
+        # (
+        #     "LGBM",
+        #     lgb.LGBMClassifier(
+        #         random_state=42, boosting_type="gbdt", n_jobs=40, learning_rate=0.05
+        #     ),
+        # ),
     ]
 
-    for name, model in zip(names, classifiers):
-        model.fit(X, y)
-        original_X = original_dataset.values[:, 1:-1]
-        original_y = original_dataset.values[:, -1]
-        y_pred = model.predict(original_X)
-        TP, FP, TN, FN = tfpn_counter.count_TP_FP_TN_FN(original_y, y_pred)
-        print(f"{name} TP: {TP}")
-        print(f"{name} TN: {TN}")
-        print(f"{name} FP: {FP}")
-        print(f"{name} FN: {FN}")
-        owriter.dump(original_dataset, original_y, y_pred)
+    for name, model in classifiers:
+        kfold = StratifiedKFold(
+            n_splits=cv, shuffle=True, random_state=random_states[0]
+        )
+        for train_idx, test_idx in kfold.split(X, y):
+            X_train, X_test = X[train_idx], X[test_idx]
+            y_train, y_test = y[train_idx], y[test_idx]
 
-        # for e in range(1):
-        #     kfold = StratifiedKFold(n_splits=cv, shuffle=True, random_state=random_states[e])
-        #     scores = cross_validate(model, X, y, cv=kfold, n_jobs=40, scoring=['accuracy', 'f1_weighted'], verbose=1)
+            model.fit(X_train, y_train)
+            y_pred = model.predict(original_dataset.values[:, 1:-1])
 
-        #     acc.extend(scores['test_accuracy'].tolist())
-        #     f1.extend(scores['test_f1_weighted'].tolist())
-
-        #     # 计算 TP, TN, FP, FN
-        #     for train_idx, test_idx in kfold.split(X, y):
-        #         X_train, X_test = X[train_idx], X[test_idx]
-        #         y_train, y_test = y[train_idx], y[test_idx]
-
-        #         model.fit(X_train, y_train)
-        #         y_pred = model.predict(X_test)
-
-        #         TP, FP, TN, FN = tfpn_counter.count_TP_FP_TN_FN(y_test, y_pred)
-        #         tp.append(TP)
-        #         fp.append(FP)
-        #         tn.append(TN)
-        #         fn.append(FN)
-
-        # print(f"{name} TP: {np.sum(tp)}")
-        # print(f"{name} TN: {np.sum(tn)}")
-        # print(f"{name} FP: {np.sum(fp)}")
-        # print(f"{name} FN: {np.sum(fn)}")
+            TP, FP, TN, FN = tfpn_counter.count_TP_FP_TN_FN(
+                original_dataset.values[:, -1], y_pred
+            )
+            print(f"TP: {TP}, FP: {FP}, TN: {TN}, FN: {FN}")
+            owriter.dump(original_dataset, y_pred)
 
 
 if __name__ == "__main__":
@@ -416,7 +347,7 @@ if __name__ == "__main__":
     db_name = sys.argv[1]  #'malware'
     rq = db_name + ".csv"
     epoch = 5
-    cv = 10
+    cv = 2
     apk_number_per_author = 1
     percentiles = [100]
     feature_type = sys.argv[2]  #'customsmali_perm_lib'
