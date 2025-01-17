@@ -54,7 +54,7 @@ class TFPNCounter:
         """
         for author in self.dbpth.iterdir():
             if author.is_dir():
-                apks = set(apk for apk in author.iterdir() if apk.is_file())
+                apks = set(apk.stem for apk in author.iterdir() if apk.is_file())
                 self.author_apks[author.stem] = apks
 
     def _init_negatives(self, isNegative: Callable[[str, set[str]], bool]):
@@ -97,10 +97,13 @@ class AssociationOutputWriter:
     Write the association output to a file. (json)
     """
 
-    def __init__(self, out_folder: Path):
+    def __init__(self, out_folder: Path, author_apks: Dict[str, set[str]]):
         out_folder.mkdir(parents=True, exist_ok=True)
         self.pred_fout = out_folder / "pred.json"
         self.trainset_fout = out_folder / "trainset.json"
+        self.testset_fout = out_folder / "testset.json"
+
+        self.author_apks = author_apks
 
     def dump_trainset(self, dataset: pd.DataFrame):
         ret = defaultdict(list)
@@ -111,6 +114,16 @@ class AssociationOutputWriter:
             ret[author].append(apkName)
 
         json.dump(ret, self.trainset_fout.open("w"), indent=4)
+
+    def dump_testset(self, dataset: pd.DataFrame):
+        ret = defaultdict(list)
+
+        for i in range(dataset.shape[0]):
+            author = dataset.iloc[i, -1]
+            apkName = dataset.iloc[i, 0]
+            ret[author].append(apkName)
+
+        json.dump(ret, self.testset_fout.open("w"), indent=4)
 
     def dump_pred(self, dataset: pd.DataFrame, y_pred: NDArray, _print=False):
         """
@@ -125,12 +138,15 @@ class AssociationOutputWriter:
             apkName = dataset.iloc[i, 0]
             pred_author = y_pred[i]
 
-            ret[author]["ground_truth"].append(apkName)
+            # ret[author]["ground_truth"].append(apkName)
             ret[pred_author]["predicted"].append(apkName)
 
             if _print:
                 print(f"{apkName} - y-true: {author} -> y-pred {pred_author}")
 
+        # include all authors and apks
+        for author, apks in self.author_apks.items():
+            ret[author]["ground_truth"] = list(apks)
         json.dump(ret, self.pred_fout.open("w"), indent=4)
 
 
@@ -357,6 +373,7 @@ def crossval_TFPN(
             owriter.dump_trainset(dataset.iloc[train_idx, :])
             # owriter.dump_pred(original_dataset, y_pred)
             owriter.dump_pred(dataset.iloc[test_idx, :], y_pred)
+            owriter.dump_testset(dataset.iloc[test_idx, :])
 
 
 if __name__ == "__main__":
@@ -373,7 +390,9 @@ if __name__ == "__main__":
     tfpn_counter = TFPNCounter(
         Path(f"./apk/{db_name}"), lambda author, apks: len(apks) <= 1
     )
-    owriter = AssociationOutputWriter(Path(f"./result/{db_name}-50-50"))
+    owriter = AssociationOutputWriter(
+        Path(f"./result/{db_name}-50-50"), tfpn_counter.author_apks
+    )
 
     result_folder = os.getcwd() + "/result/"
     feature_folder = os.getcwd() + "/feature/"
