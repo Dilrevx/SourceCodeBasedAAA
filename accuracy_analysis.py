@@ -112,7 +112,7 @@ class AssociationOutputWriter:
 
         json.dump(ret, self.trainset_fout.open("w"), indent=4)
 
-    def dump_pred(self, dataset: pd.DataFrame, y_pred: NDArray, print=False):
+    def dump_pred(self, dataset: pd.DataFrame, y_pred: NDArray, _print=False):
         """
         X: apkName
         y: true label
@@ -128,7 +128,7 @@ class AssociationOutputWriter:
             ret[author]["ground_truth"].append(apkName)
             ret[pred_author]["predicted"].append(apkName)
 
-            if print:
+            if _print:
                 print(f"{apkName} - y-true: {author} -> y-pred {pred_author}")
 
         json.dump(ret, self.pred_fout.open("w"), indent=4)
@@ -345,14 +345,18 @@ def crossval_TFPN(
             y_train, y_test = y[train_idx], y[test_idx]
 
             model.fit(X_train, y_train)
-            y_pred = model.predict(original_dataset.values[:, 1:-1])
+            # y_pred = model.predict(original_dataset.values[:, 1:-1])
+            y_pred = model.predict(X_test)
 
             TP, FP, TN, FN = tfpn_counter.count_TP_FP_TN_FN(
-                original_dataset.values[:, -1], y_pred
+                # original_dataset.values[:, -1], y_pred
+                y_test,
+                y_pred,
             )
             print(f"TP: {TP}, FP: {FP}, TN: {TN}, FN: {FN}")
             owriter.dump_trainset(dataset.iloc[train_idx, :])
-            owriter.dump_pred(original_dataset, y_pred)
+            # owriter.dump_pred(original_dataset, y_pred)
+            owriter.dump_pred(dataset.iloc[test_idx, :], y_pred)
 
 
 if __name__ == "__main__":
@@ -369,7 +373,7 @@ if __name__ == "__main__":
     tfpn_counter = TFPNCounter(
         Path(f"./apk/{db_name}"), lambda author, apks: len(apks) <= 1
     )
-    owriter = AssociationOutputWriter(Path(f"./result/{db_name}"))
+    owriter = AssociationOutputWriter(Path(f"./result/{db_name}-50-50"))
 
     result_folder = os.getcwd() + "/result/"
     feature_folder = os.getcwd() + "/feature/"
