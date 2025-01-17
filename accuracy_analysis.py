@@ -97,10 +97,22 @@ class AssociationOutputWriter:
     Write the association output to a file. (json)
     """
 
-    def __init__(self, output_file: Path):
-        self.output_file = output_file
+    def __init__(self, out_folder: Path):
+        out_folder.mkdir(parents=True, exist_ok=True)
+        self.pred_fout = out_folder / "pred.json"
+        self.trainset_fout = out_folder / "trainset.json"
 
-    def dump(self, dataset: pd.DataFrame, y_pred: NDArray, print=False):
+    def dump_trainset(self, dataset: pd.DataFrame):
+        ret = defaultdict(list)
+
+        for i in range(dataset.shape[0]):
+            author = dataset.iloc[i, -1]
+            apkName = dataset.iloc[i, 0]
+            ret[author].append(apkName)
+
+        json.dump(ret, self.trainset_fout.open("w"), indent=4)
+
+    def dump_pred(self, dataset: pd.DataFrame, y_pred: NDArray, print=False):
         """
         X: apkName
         y: true label
@@ -119,7 +131,7 @@ class AssociationOutputWriter:
             if print:
                 print(f"{apkName} - y-true: {author} -> y-pred {pred_author}")
 
-        json.dump(ret, self.output_file.open("w"), indent=4)
+        json.dump(ret, self.pred_fout.open("w"), indent=4)
 
 
 def create_dataset_object(feature_type: str, number_of_ngram: int):
@@ -339,7 +351,8 @@ def crossval_TFPN(
                 original_dataset.values[:, -1], y_pred
             )
             print(f"TP: {TP}, FP: {FP}, TN: {TN}, FN: {FN}")
-            owriter.dump(original_dataset, y_pred)
+            owriter.dump_trainset(dataset.iloc[train_idx, :])
+            owriter.dump_pred(original_dataset, y_pred)
 
 
 if __name__ == "__main__":
@@ -356,7 +369,7 @@ if __name__ == "__main__":
     tfpn_counter = TFPNCounter(
         Path(f"./apk/{db_name}"), lambda author, apks: len(apks) <= 1
     )
-    owriter = AssociationOutputWriter(Path(f"./result/{db_name}.json"))
+    owriter = AssociationOutputWriter(Path(f"./result/{db_name}"))
 
     result_folder = os.getcwd() + "/result/"
     feature_folder = os.getcwd() + "/feature/"
