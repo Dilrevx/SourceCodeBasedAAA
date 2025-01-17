@@ -138,15 +138,15 @@ class AssociationOutputWriter:
             apkName = dataset.iloc[i, 0]
             pred_author = y_pred[i]
 
-            # ret[author]["ground_truth"].append(apkName)
+            ret[author]["ground_truth"].append(apkName)
             ret[pred_author]["predicted"].append(apkName)
 
             if _print:
                 print(f"{apkName} - y-true: {author} -> y-pred {pred_author}")
 
         # include all authors and apks
-        for author, apks in self.author_apks.items():
-            ret[author]["ground_truth"] = list(apks)
+        # for author, apks in self.author_apks.items():
+        #     ret[author]["ground_truth"] = list(apks)
         json.dump(ret, self.pred_fout.open("w"), indent=4)
 
 
@@ -370,6 +370,20 @@ def crossval_TFPN(
                 y_pred,
             )
             print(f"TP: {TP}, FP: {FP}, TN: {TN}, FN: {FN}")
+
+            scores = cross_validate(
+                model,
+                X,
+                y,
+                cv=kfold,
+                n_jobs=40,
+                scoring=["accuracy", "f1_weighted"],
+                verbose=1,
+            )
+            print(
+                f"Scores: Accuracy: {scores['test_accuracy'].mean()}, F1: {scores['test_f1_weighted'].mean()}"
+            )
+
             owriter.dump_trainset(dataset.iloc[train_idx, :])
             # owriter.dump_pred(original_dataset, y_pred)
             owriter.dump_pred(dataset.iloc[test_idx, :], y_pred)
@@ -391,7 +405,9 @@ if __name__ == "__main__":
         Path(f"./apk/{db_name}"), lambda author, apks: len(apks) <= 1
     )
     owriter = AssociationOutputWriter(
-        Path(f"./result/{db_name}-50-50"), tfpn_counter.author_apks
+        Path(f"./result/{db_name}-50-50"),
+        tfpn_counter.author_apks,
+        # Path(f"./result/{db_name}"), tfpn_counter.author_apks
     )
 
     result_folder = os.getcwd() + "/result/"
