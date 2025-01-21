@@ -113,7 +113,7 @@ class AssociationOutputWriter:
             apkName = dataset.iloc[i, 0]
             ret[author].append(apkName)
 
-        json.dump(ret, self.trainset_fout.open("w"), indent=4)
+        json.dump(ret, self.trainset_fout.open("w"), indent=4, sort_keys=True)
 
     def dump_testset(self, dataset: pd.DataFrame):
         ret = defaultdict(list)
@@ -123,7 +123,7 @@ class AssociationOutputWriter:
             apkName = dataset.iloc[i, 0]
             ret[author].append(apkName)
 
-        json.dump(ret, self.testset_fout.open("w"), indent=4)
+        json.dump(ret, self.testset_fout.open("w"), indent=4, sort_keys=True)
 
     def dump_pred(self, dataset: pd.DataFrame, y_pred: NDArray, _print=False):
         """
@@ -147,7 +147,7 @@ class AssociationOutputWriter:
         # include all authors and apks
         # for author, apks in self.author_apks.items():
         #     ret[author]["ground_truth"] = list(apks)
-        json.dump(ret, self.pred_fout.open("w"), indent=4)
+        json.dump(ret, self.pred_fout.open("w"), indent=4, sort_keys=True)
 
 
 def create_dataset_object(feature_type: str, number_of_ngram: int):
